@@ -45,7 +45,11 @@ jobs:
         uses: hashicorp/setup-packer@v3
         with:
           packer-version: 'latest'
-
+      
+      # Initialize Packer Plugins
+      - name: Initialize Packer Plugins
+          run:|
+            packer init .
 
       # Build AMI with Packer
       - name: Build AMI with Packer
