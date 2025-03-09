@@ -24,10 +24,3 @@ jobs:
           cd terraform/test
           terraform init
           terraform apply -auto-approve
-
-      - name: Initialize and Apply Terraform for PROD Environment
-        if: github.ref == 'refs/heads/main'
-        run: |
-          cd terraform/prod
-          terraform init
-          terraform apply -auto-approve
