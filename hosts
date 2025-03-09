@@ -1,2 +1,0 @@
-[servers]
-example ansible_host=ec2-xx-xx-xx-xx.eu-west-3.compute.amazonaws.com
