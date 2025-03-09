@@ -42,7 +42,10 @@ jobs:
 
       # Setup Packer
       - name: Setup Packer
-        uses: hashicorp/setup-packer@v1
+        uses: hashicorp/setup-packer@v3
+        with:
+          packer-version: 'latest'
+
 
       # Build AMI with Packer
       - name: Build AMI with Packer
