@@ -8,40 +8,50 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Configure AWS Credentials using the role
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: '1.4.5'
 
+      # Terraform Init
       - name: Terraform Init
         run: terraform init
 
-      - name: Terraform Format
-        run: terraform fmt -check
-
-      - name: Terraform Validate
-        run: terraform validate
-
+      # Terraform Plan
       - name: Terraform Plan
-        run: terraform plan -input=false
+        run: terraform plan
 
+      # Terraform Apply
       - name: Terraform Apply
-        if: github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false
+        run: terraform apply -auto-approve
 
-      - name: Setup Ansible
-        uses: geerlingguy/ansible@v3
-        with:
-          ansible-version: '6.3.0'
+      # Setup Packer
+      - name: Setup Packer
+        uses: hashicorp/setup-packer@v1
+
+      # Build AMI with Packer
+      - name: Build AMI with Packer
+        run: |
+          packer build packer.json
+
+      # Install Ansible and Run Playbook
+      - name: Install Ansible
+        run: sudo apt update && sudo apt install ansible -y
 
       - name: Run Ansible Playbook
-        run: |
-          echo "ec2-xx-xx-xx-xx.eu-west-3.compute.amazonaws.com" > hosts
-          ansible-playbook -i hosts playbook.yml
+        run: ansible-playbook playbook.yml --inventory hosts --private-key ~/.ssh/id_rsa
