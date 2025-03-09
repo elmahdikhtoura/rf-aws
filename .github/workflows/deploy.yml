@@ -12,51 +12,49 @@ jobs:
       id-token: write
       contents: read
     steps:
+      # Étape 1 : Récupérer le code source
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      # Configure AWS Credentials using the role
+      # Étape 2 : Configurer les identifiants AWS
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # Setup Terraform
+      # Étape 3 : Installer Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: '1.4.5'
 
-      # Terraform Init
+      # Étape 4 : Initialiser Terraform
       - name: Terraform Init
         run: terraform init
 
-      # Terraform Plan
+      # Étape 5 : Planifier les changements Terraform
       - name: Terraform Plan
         run: terraform plan
 
-      # Terraform Apply
+      # Étape 6 : Appliquer les changements Terraform
       - name: Terraform Apply
         run: terraform apply -auto-approve
 
-      # Setup Packer
+      # Étape 7 : Installer Packer et initialiser les plugins
       - name: Setup Packer
         uses: hashicorp/setup-packer@v3
         with:
           packer-version: 'latest'
-      
-      # Initialize Packer Plugins
+
       - name: Initialize Packer Plugins
-          run:|
-            packer init .
+        run: packer init .
 
-      # Build AMI with Packer
+      # Étape 8 : Construire une AMI avec Packer
       - name: Build AMI with Packer
-        run: |
-          packer build packer.json
+        run: packer build packer.json
 
-      # Install Ansible and Run Playbook
+      # Étape 9 : Installer Ansible et exécuter le playbook
       - name: Install Ansible
         run: sudo apt update && sudo apt install ansible -y
 
