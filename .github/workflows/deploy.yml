@@ -50,13 +50,11 @@ jobs:
       - name: Initialize Packer Plugins
         run: packer init .
 
-      # Étape 8 : Construire une AMI avec Packer
-      - name: Build AMI with Packer
-        run: packer build packer.json
+      # Étape 8 : Construire une AMI avec Packer et Ansible
+      - name: Build AMI with Packer and Ansible Provisioner
+        run: packer build packer.pkr.hcl
 
-      # Étape 9 : Installer Ansible et exécuter le playbook
-      - name: Install Ansible
+      # Étape 9 : Installer Ansible (si nécessaire)
+      - name: Install Ansible Locally (Optional)
         run: sudo apt update && sudo apt install ansible -y
 
-      - name: Run Ansible Playbook
-        run: ansible-playbook playbook.yml --inventory hosts --private-key ~/.ssh/id_rsa
